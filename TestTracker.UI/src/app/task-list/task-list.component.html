@@ -1,0 +1,115 @@
+<div class="task-list-container">
+  <!-- Header sa dugmetom za dodavanje -->
+  <div class="header">
+    <h2>Lista Taskova</h2>
+    <button class="btn btn-primary" (click)="showAddForm()">
+      + Dodaj novi task
+    </button>
+  </div>
+
+  <!-- Forma za dodavanje/uređivanje -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-card">
+      <div class="form-header">
+        <h3>{{ editingTask ? 'Uredi task' : 'Dodaj novi task' }}</h3>
+        <button class="btn btn-back" (click)="hideForm()">
+          ← Nazad na listu
+        </button>
+      </div>
+      
+      <form (ngSubmit)="saveTask()" #taskForm="ngForm">
+        <div class="form-group">
+          <label for="naslov">Naslov *</label>
+          <input 
+            type="text" 
+            id="naslov" 
+            [(ngModel)]="newTask.naslov" 
+            name="naslov"
+            class="form-control"
+            placeholder="Unesite naslov taska"
+            required
+            #naslovInput="ngModel">
+        </div>
+
+        <div class="form-group">
+          <label for="opis">Opis</label>
+          <textarea 
+            id="opis" 
+            [(ngModel)]="newTask.opis" 
+            name="opis"
+            class="form-control"
+            placeholder="Unesite opis taska (opciono)"
+            rows="3"
+            #opisInput="ngModel"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select 
+            id="status" 
+            [(ngModel)]="newTask.status" 
+            name="status"
+            class="form-control"
+            #statusInput="ngModel">
+            <option *ngFor="let status of statusOptions" [value]="status">
+              {{ status }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" (click)="saveTask()">
+            {{ editingTask ? 'Ažuriraj' : 'Dodaj' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="hideForm()">
+            Otkaži
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista taskova -->
+  <div class="tasks-grid" *ngIf="!showForm">
+    <div class="task-card" *ngFor="let task of tasks">
+      <div class="task-header">
+        <h4>{{ task.naslov }}</h4>
+        <div class="task-actions">
+          <button class="btn btn-sm btn-edit" (click)="showEditForm(task)">
+            Izmeni
+          </button>
+          <button class="btn btn-sm btn-delete" (click)="deleteTask(task.id)">
+            Izbriši
+          </button>
+        </div>
+      </div>
+
+      <div class="task-body">
+        <p class="task-description" *ngIf="task.opis">{{ task.opis }}</p>
+        <p class="task-date">Kreiran: {{ formatDate(task.datumKreiranja) }}</p>
+      </div>
+
+      <div class="task-footer">
+        <div class="status-container">
+          <label>Status:</label>
+          <select 
+            [(ngModel)]="task.status" 
+            (change)="updateStatus(task, task.status)"
+            class="status-select"
+            [class.status-u-toku]="task.status === 'U toku'"
+            [class.status-zavrsen]="task.status === 'Završen'"
+            [class.status-otkazan]="task.status === 'Otkazan'">
+            <option *ngFor="let status of statusOptions" [value]="status">
+              {{ status }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Poruka kada nema taskova -->
+  <div class="no-tasks" *ngIf="tasks.length === 0 && !showForm">
+    <p>Nema kreiranih taskova. Dodajte prvi task!</p>
+  </div>
+</div>
