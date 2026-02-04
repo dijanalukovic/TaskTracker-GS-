@@ -52,7 +52,7 @@ API će biti dostupan na: http://localhost:5231
 
 ### Frontend (Angular)
 ```bash
-cd task-tracker-ui
+cd TestTracker.UI
 npm install
 npm start
 ```
