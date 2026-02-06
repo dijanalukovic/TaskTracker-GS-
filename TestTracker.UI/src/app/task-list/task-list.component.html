@@ -1,6 +1,6 @@
 <div class="task-list-container">
   <!-- Header sa dugmetom za dodavanje -->
-  <div class="header">
+  <div class="header" *ngIf="!showForm">
     <h2>Lista Taskova</h2>
     <button class="btn btn-primary" (click)="showAddForm()">
       + Dodaj novi task
@@ -13,7 +13,7 @@
       <div class="form-header">
         <h3>{{ editingTask ? 'Uredi task' : 'Dodaj novi task' }}</h3>
         <button class="btn btn-back" (click)="hideForm()">
-          ← Nazad na listu
+          Nazad na listu
         </button>
       </div>
       
@@ -58,10 +58,10 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-success" (click)="saveTask()">
-            {{ editingTask ? 'Ažuriraj' : 'Dodaj' }}
+          <button type="submit" class="btn btn-success" [disabled]="isSaving">
+            {{ isSaving ? 'Čuvanje...' : (editingTask ? 'Ažuriraj' : 'Dodaj') }}
           </button>
-          <button type="button" class="btn btn-secondary" (click)="hideForm()">
+          <button type="button" class="btn btn-secondary" (click)="hideForm()" [disabled]="isSaving">
             Otkaži
           </button>
         </div>

@@ -22,6 +22,7 @@ export class TaskListComponent implements OnInit {
   };
   editingTask: TaskItem | null = null;
   showForm = false;
+  isSaving = false; // Flag za sprečavanje duplih poziva
 
   statusOptions = ['U toku', 'Završen', 'Otkazan'];
 
@@ -38,7 +39,10 @@ export class TaskListComponent implements OnInit {
       next: (tasks) => {
         console.log('Tasks loaded:', tasks);
         console.log('Number of tasks:', tasks.length);
-        this.tasks = [...tasks]; // Kreiraj novi array
+        // Sortiraj taskove po datumu kreiranja - najnoviji prvi
+        this.tasks = [...tasks].sort((a, b) => {
+          return new Date(b.datumKreiranja).getTime() - new Date(a.datumKreiranja).getTime();
+        });
         this.cdr.detectChanges(); // Forsiraj change detection
         console.log('this.tasks after assignment:', this.tasks);
       },
@@ -80,15 +84,25 @@ export class TaskListComponent implements OnInit {
       return;
     }
 
+    // Sprečavanje duplih poziva
+    if (this.isSaving) {
+      console.log('Već se čuva task, ignoriši dupli poziv');
+      return;
+    }
+
+    this.isSaving = true;
+
     if (this.editingTask) {
       // Ažuriranje postojećeg taska
       this.taskService.update(this.newTask).subscribe({
         next: () => {
           this.loadTasks();
           this.hideForm();
+          this.isSaving = false;
         },
         error: (error) => {
           console.error('Greška pri ažuriranju taska:', error);
+          this.isSaving = false;
         }
       });
     } else {
@@ -105,10 +119,12 @@ export class TaskListComponent implements OnInit {
         next: () => {
           this.loadTasks();
           this.hideForm();
+          this.isSaving = false;
         },
         error: (error) => {
           alert('Greška pri dodavanju taska: ' + error.message);
           console.error('Greška pri dodavanju taska:', error);
+          this.isSaving = false;
         }
       });
     }
